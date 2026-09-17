@@ -5,8 +5,8 @@
 // @match          https://*.alliances.commandandconquer.com/*/index.aspx*
 // @version        2.3.0
 // @author         Panavia, KRS_L, DebitoSphere
-// @downloadURL    https://update.greasyfork.org/scripts/1905/Tiberium%20Alliances%20Formation%20Saver.user.js
-// @updateURL      https://update.greasyfork.org/scripts/1905/Tiberium%20Alliances%20Formation%20Saver.meta.js
+// @downloadURL    https://raw.githubusercontent.com/Harzi66/CnC-TA-Building_-_Off-Saver-HE/main/CnC-TA-Formation-Saver.user.js.user.js
+// @updateURL      https://raw.githubusercontent.com/Harzi66/CnC-TA-Building_-_Off-Saver-HE/main/CnC-TA-Formation-Saver.user.js.user.js
 // ==/UserScript==
 (function (){
     var tafs_main = function() {
