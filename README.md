@@ -2,9 +2,7 @@
 
 Tampermonkey-Script für **Command & Conquer: Tiberium Alliances**.
 
-# Achtung! Wenn du dieses Script nutzen möchtest und zum Speichern deiner Angriffsformationen den 
-Tiberium Alliances Formation Saver 2.3.3 aus dem SoO Script deaktivieren und durch den 
-Tiberium Alliances Formation hier aus der Reposity erstzen.
+# Achtung! Wenn du dieses Script nutzen möchtest und zum Speichern deiner Angriffsformationen den Tiberium Alliances Formation Saver 2.3.3 aus dem SoO Script deaktivieren und durch den Tiberium Alliances Formation hier aus der Reposity erstzen.
 
 
 Das Script erweitert das Spiel um zwei getrennte Speicherfunktionen:
