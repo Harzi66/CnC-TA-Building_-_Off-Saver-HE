@@ -97,7 +97,7 @@ Dadurch bleiben die gespeicherten Aufstellungen auch nach einem Neustart des Bro
 
 ### Changelog
 
-#### 1.0.0
+#### 1.0.7
 - Erste veröffentlichte Version
 - Building Saver integriert
 - Off-Saver integriert
