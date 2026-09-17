@@ -1,12 +1,13 @@
 // ==UserScript==
 // @name           CnC-TA-Building_&_Off-Saver - HE
 // @namespace      https://prodgame*.alliances.commandandconquer.com/*/index.aspx*
-// @match          https://*.alliances.commandandconquer.com/*/index.aspx*
 // @version        1.0.7
-// @description    Speichert und lädt Gebäudeaufstellungen
+// @description    Speichert und lädt Gebäudeaufstellungen und Off-Formationen
 // @author         Harzi
+// @match          https://*.alliances.commandandconquer.com/*/index.aspx*
+// @downloadURL    https://raw.githubusercontent.com/Harzi66/CnC-TA-Building_%26_Off-Saver-HE/main/CnC-TA-Building_%26_Off-Saver%20-%20HE.user.js
+// @updateURL      https://raw.githubusercontent.com/Harzi66/CnC-TA-Building_%26_Off-Saver-HE/main/CnC-TA-Building_%26_Off-Saver%20-%20HE.user.js
 // ==/UserScript==
-
 (function () {
 
     var buildingSaverContainer = null;
