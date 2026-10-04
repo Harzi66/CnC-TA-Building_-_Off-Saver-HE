@@ -3,7 +3,7 @@
 // @description    Allows you to save attack formations
 // @namespace      https://prodgame*.alliances.commandandconquer.com/*/index.aspx*
 // @match          https://*.alliances.commandandconquer.com/*/index.aspx*
-// @version        2.3.0
+// @version        2.3.5
 // @author         Panavia, KRS_L, DebitoSphere
 // @downloadURL    https://raw.githubusercontent.com/Harzi66/CnC-TA-Building_-_Off-Saver-HE/main/CnC-TA-Formation-Saver.user.js
 // @updateURL      https://raw.githubusercontent.com/Harzi66/CnC-TA-Building_-_Off-Saver-HE/main/CnC-TA-Formation-Saver.user.js
@@ -294,7 +294,7 @@
 
             windowSaver = new webfrontend.gui.PlayArea.FormationSaver();
             windowSaver.hide();
-            qx.core.Init.getApplication().getPlayArea().add(windowSaver, {top: 225, right: -2});
+            qx.core.Init.getApplication().getPlayArea().add(windowSaver, {top: 225, left: -2});
 
             if(!ClientLib.Data.MainData.GetInstance().get_Cities().__tafs__set_CurrentOwnCityId) {
                 ClientLib.Data.MainData.GetInstance().get_Cities().__tafs__set_CurrentOwnCityId = ClientLib.Data.MainData.GetInstance().get_Cities().set_CurrentOwnCityId;
