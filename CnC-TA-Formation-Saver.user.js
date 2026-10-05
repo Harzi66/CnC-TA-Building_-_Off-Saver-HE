@@ -361,11 +361,9 @@
         }
     }
 
-    // injecting, because there seem to be problems when creating game interface with unsafeWindow
-    var tafsScript = document.createElement("script");
-    tafsScript.innerHTML = "(" + tafs_main.toString() + ")();";
-    tafsScript.type = "text/javascript";
+    // Die Erweiterung läuft bereits in der MAIN-Welt.
+    // Eine zusätzliche Script-Injektion ist daher nicht mehr erforderlich.
     if (/commandandconquer\.com/i.test(document.domain)) {
-        document.getElementsByTagName("head")[0].appendChild(tafsScript);
+        tafs_main();
     }
 })();
