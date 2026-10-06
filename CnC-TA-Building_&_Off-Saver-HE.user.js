@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           CnC-TA-Building_&_Off-Saver - HE
 // @namespace      https://prodgame*.alliances.commandandconquer.com/*/index.aspx*
-// @version        1.2.5
+// @version        1.2.6
 // @description    Speichert und lädt Gebäudeaufstellungen und Off-Formationen
 // @author         Harzi
 // @match          https://*.alliances.commandandconquer.com/*/index.aspx*
@@ -772,6 +772,19 @@
 
         var saved =
             layouts[layoutName];
+
+        // Alte/ungültige Speicherstände dürfen den Saver nicht mehr
+        // mit einem TypeError abbrechen lassen. Nur gültige Formationen
+        // mit einem units-Array werden geladen.
+        if (!saved || !Array.isArray(saved.units)) {
+            console.warn(
+                "%cFORMATION: Ungültiger oder veralteter Speicherstand für \"" +
+                layoutName +
+                "\" – Formation wird nicht geladen.",
+                "color: orange; font-weight: bold;"
+            );
+            return;
+        }
 
         var currentCity =
             cities.get_CurrentCity();
