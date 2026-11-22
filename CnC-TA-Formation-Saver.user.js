@@ -1,12 +1,12 @@
 // ==UserScript==
-// @name           CnC-TA-Formation-Saver
+// @name           CnC-TA-Formation-Saver - HE
 // @description    Allows you to save attack formations
 // @namespace      https://prodgame*.alliances.commandandconquer.com/*/index.aspx*
 // @match          https://*.alliances.commandandconquer.com/*/index.aspx*
-// @version        2.3.17
+// @version        2.3.5
 // @author         Panavia, KRS_L, DebitoSphere
-// @downloadURL    https://raw.githubusercontent.com/Harzi66/CnC-TA-Building_-_Off-Saver-HE/main/CnC-TA-Formation-Saver.user.js
-// @updateURL      https://raw.githubusercontent.com/Harzi66/CnC-TA-Building_-_Off-Saver-HE/main/CnC-TA-Formation-Saver.user.js
+// @downloadURL    https://update.greasyfork.org/scripts/1905/Tiberium%20Alliances%20Formation%20Saver.user.js
+// @updateURL      https://update.greasyfork.org/scripts/1905/Tiberium%20Alliances%20Formation%20Saver.meta.js
 // ==/UserScript==
 (function (){
     var tafs_main = function() {
@@ -39,8 +39,6 @@
                     containerSaves: null,
                     containerMain: null,
                     buttonSave: null,
-                    optionsWindow: null,
-                    highlightSettings: null,
 
                     init: function() {
                         var Y = 6;
@@ -62,15 +60,8 @@
                         buttonSave = new qx.ui.form.Button("Save");
                         buttonSave.set({width: 50, appearance: "button-text-small", toolTipText: "Save attack formation", allowGrowX:false});
                         buttonSave.addListener("click", this.save, this);
-                        // Right-click opens settings; the normal left-click save action stays unchanged.
-                        buttonSave.addListener("contextmenu", function(e) {
-                            if (e && e.preventDefault) e.preventDefault();
-                            this.openOptions();
-                        }, this);
                         this.containerContence.add(buttonSave);
 
-                        this.loadHighlightSettings();
-                        this.createOptionsWindow();
 
                         this.containerMain=new qx.ui.container.Composite(new qx.ui.layout.VBox().set({alignX:"right"})).set({maxHeight:webfrontend.gui.PlayArea.FormationSaver.SaverExpandedHeight,width:75,minHeight:32,allowShrinkY:true});
                         this.containerMain.add(ba);
@@ -271,303 +262,6 @@
                         windowSaver.update();
                     },
 
-                    // Persistent world-map highlighting settings (independent of TACS).
-                    loadHighlightSettings: function() {
-                        var defaults = { enabled: true, color: "Cyan", textColor: "#FF6600", language: "auto" };
-                        try {
-                            var stored = localStorage.tafs_highlight_settings;
-                            this.highlightSettings = stored ? Object.assign({}, defaults, JSON.parse(stored)) : defaults;
-                        } catch (e) {
-                            this.highlightSettings = defaults;
-                        }
-                    },
-
-                    saveHighlightSettings: function() {
-                        try { localStorage.tafs_highlight_settings = JSON.stringify(this.highlightSettings); } catch (e) { console.log(e); }
-                    },
-
-                    getLanguage: function() {
-                        var choice = this.highlightSettings ? this.highlightSettings.language : "auto";
-                        var lang = choice;
-                        if (lang === "auto") {
-                            lang = (document.documentElement && document.documentElement.lang) || (navigator.language || "de");
-                        }
-                        lang = String(lang).toLowerCase().substring(0, 2);
-                        return (lang === "en" || lang === "es" || lang === "fr") ? lang : "de";
-                    },
-
-                    tr: function(key) {
-                        var dict = {
-                            de: { title:"Formation-Saver", enabled:"Markierung aktiv", color:"Farbauswahl Hintergrund", textColor:"Farbe Schrift", language:"Sprachauswahl", automatic:"Automatisch", cyan:"Hellblau", orange:"Orange", blue:"Blau", white:"Weiß", red:"Rot", yellow:"Gelb", green:"Grün", purple:"Violett", pink:"Pink", magenta:"Magenta", lime:"Limette", teal:"Petrol", brown:"Braun", gray:"Grau", navy:"Marineblau", close:"Schließen", info:"Gespeicherte Ziele werden markiert." },
-                            en: { title:"Formation Saver", enabled:"Highlighting active", color:"Background color", textColor:"Text color", language:"Language selection", automatic:"Automatic", cyan:"Light blue", orange:"Orange", blue:"Blue", white:"White", red:"Red", yellow:"Yellow", green:"Green", purple:"Purple", pink:"Pink", magenta:"Magenta", lime:"Lime", teal:"Teal", brown:"Brown", gray:"Gray", navy:"Navy", close:"Close", info:"Marks targets with saved formations." },
-                            es: { title:"Formation Saver", enabled:"Resaltado activo", color:"Color de fondo", textColor:"Color del texto", language:"Selección de idioma", automatic:"Automático", cyan:"Azul claro", orange:"Naranja", blue:"Azul", white:"Blanco", red:"Rojo", yellow:"Amarillo", green:"Verde", purple:"Violeta", pink:"Rosa", magenta:"Magenta", lime:"Lima", teal:"Verde azulado", brown:"Marrón", gray:"Gris", navy:"Azul marino", close:"Cerrar", info:"Marca objetivos con formaciones guardadas." },
-                            fr: { title:"Formation Saver", enabled:"Marquage actif", color:"Couleur d’arrière-plan", textColor:"Couleur du texte", language:"Choix de la langue", automatic:"Automatique", cyan:"Bleu clair", orange:"Orange", blue:"Bleu", white:"Blanc", red:"Rouge", yellow:"Jaune", green:"Vert", purple:"Violet", pink:"Rose", magenta:"Magenta", lime:"Citron vert", teal:"Sarcelle", brown:"Marron", gray:"Gris", navy:"Bleu marine", close:"Fermer", info:"Marque les cibles avec formations sauvegardées." }
-                        };
-                        return dict[this.getLanguage()][key] || key;
-                    },
-
-                    createOptionsWindow: function() {
-                        var self = this;
-                        this.optionsWindow = new qx.ui.window.Window(this.tr("title"), "FactionUI/icons/icon_forum_properties.png").set({
-                            width: 190, height: 315, showMaximize: false, showMinimize: false,
-                            allowMaximize: false, allowMinimize: false, resizable: false,
-                            contentPadding: 7, opacity: 1, backgroundColor: "#000000"
-                        });
-                        this.optionsWindow.setLayout(new qx.ui.layout.VBox(7));
-                        this.optionsWindow.setBackgroundColor("#000000");
-                        try {
-                            this.optionsWindow.getChildControl("pane").setBackgroundColor("#000000");
-                            this.optionsWindow.getChildControl("content").setBackgroundColor("#000000");
-                        } catch (e) {}
-                        this.optionsWindow.getChildControl("icon").set({ scale: true, width: 20, height: 20 });
-
-                        var enabled = new qx.ui.form.CheckBox(this.tr("enabled")).set({
-                            textColor:"#FFFFFF", font:"small", width:170, allowGrowX:false
-                        });
-                        enabled.setValue(!!this.highlightSettings.enabled);
-                        enabled.addListener("changeValue", function(e) {
-                            self.highlightSettings.enabled = e.getData();
-                            self.saveHighlightSettings();
-                            self.refreshMapHighlighting();
-                            self.applyCityTextColor();
-                        });
-                        this.optionsWindow.add(enabled);
-
-                        // Stacked labels keep every caption readable in the narrow window.
-                        var colorLabel = new qx.ui.basic.Label(this.tr("color")).set({
-                            textColor:"#FFFFFF", font:"small", width:170, allowGrowX:false
-                        });
-                        this.optionsWindow.add(colorLabel);
-                        var colors = new qx.ui.form.SelectBox().set({
-                            width:170, textColor:"#FFFFFF", allowGrowX:false
-                        });
-                        // Read the game's actual background-plate palette instead of guessing enum names.
-                        // This exposes up to 15 distinct colors supported by the running game client.
-                        var bgEnum = ClientLib.Vis.EBackgroundPlateColor || {};
-                        var bgKeys = Object.keys(bgEnum).filter(function(key) {
-                            return !/^\d+$/.test(key) && typeof bgEnum[key] === "number";
-                        });
-                        bgKeys.sort(function(a, b) {
-                            if (a === "Cyan") return -1;
-                            if (b === "Cyan") return 1;
-                            return a.localeCompare(b);
-                        });
-                        bgKeys.slice(0, 15).forEach(function(key) {
-                            var translationKey = key.charAt(0).toLowerCase() + key.slice(1);
-                            var label = self.tr(translationKey);
-                            if (label === translationKey) {
-                                label = key.replace(/([a-z])([A-Z])/g, "$1 $2");
-                            }
-                            var li = new qx.ui.form.ListItem(label, null, key);
-                            colors.add(li);
-                            if ((self.highlightSettings.color || "Cyan") === key) colors.setSelection([li]);
-                        });
-                        if (!bgKeys.length) {
-                            var fallback = new qx.ui.form.ListItem(self.tr("cyan"), null, "Cyan");
-                            colors.add(fallback);
-                            colors.setSelection([fallback]);
-                        }
-                        colors.addListener("changeSelection", function(e) {
-                            var selected = e.getData();
-                            if (selected && selected[0]) {
-                                self.highlightSettings.color = selected[0].getModel();
-                                self.saveHighlightSettings();
-                                self.refreshMapHighlighting();
-                            }
-                        });
-                        this.optionsWindow.add(colors);
-
-                        var textColorLabel = new qx.ui.basic.Label(this.tr("textColor")).set({
-                            textColor:"#FFFFFF", font:"small", width:170, allowGrowX:false
-                        });
-                        this.optionsWindow.add(textColorLabel);
-                        var textColors = new qx.ui.form.SelectBox().set({
-                            width:170, textColor:"#FFFFFF", allowGrowX:false
-                        });
-                        [
-                            ["#FFFFFF","white"],["#FF6600","orange"],["#FF0000","red"],
-                            ["#FFFF00","yellow"],["#00C853","green"],["#00FFFF","cyan"],
-                            ["#0080FF","blue"],["#C000FF","purple"],["#FF69B4","pink"],
-                            ["#FF00FF","magenta"],["#A8E000","lime"],["#008080","teal"],
-                            ["#8B4513","brown"],["#B0B0B0","gray"],["#001F5B","navy"]
-                        ].forEach(function(item) {
-                            var li = new qx.ui.form.ListItem(self.tr(item[1]), null, item[0]);
-                            textColors.add(li);
-                            if ((self.highlightSettings.textColor || "#FF6600") === item[0]) textColors.setSelection([li]);
-                        });
-                        textColors.addListener("changeSelection", function(e) {
-                            var selected = e.getData();
-                            if (selected && selected[0]) {
-                                self.highlightSettings.textColor = selected[0].getModel();
-                                self.saveHighlightSettings();
-                                self.applyCityTextColor();
-                                self.refreshMapHighlighting();
-                            }
-                        });
-                        this.optionsWindow.add(textColors);
-
-                        var languageLabel = new qx.ui.basic.Label(this.tr("language")).set({
-                            textColor:"#FFFFFF", font:"small", width:170, allowGrowX:false
-                        });
-                        this.optionsWindow.add(languageLabel);
-                        var languages = new qx.ui.form.SelectBox().set({
-                            width:170, textColor:"#FFFFFF", allowGrowX:false
-                        });
-                        [["auto", "automatic"],["de","Deutsch"],["en","English"],["es","Español"],["fr","Français"]].forEach(function(item) {
-                            var li = new qx.ui.form.ListItem(item[1], null, item[0]);
-                            languages.add(li);
-                            if (self.highlightSettings.language === item[0]) languages.setSelection([li]);
-                        });
-                        languages.addListener("changeSelection", function(e) {
-                            var selected = e.getData();
-                            if (selected && selected[0]) {
-                                self.highlightSettings.language = selected[0].getModel();
-                                self.saveHighlightSettings();
-                                self.optionsWindow.close();
-                                self.createOptionsWindow();
-                                self.openOptions();
-                            }
-                        });
-                        this.optionsWindow.add(languages);
-
-                        var info = new qx.ui.basic.Label(this.tr("info"));
-                        info.set({
-                            rich:false, textColor:"#FFFFFF", font:"small",
-                            width:170, maxWidth:170, allowGrowX:false, wrap:true
-                        });
-                        this.optionsWindow.add(info);
-                        var close = new qx.ui.form.Button(this.tr("close")).set({
-                            width:170, allowGrowX:false
-                        });
-                        close.addListener("execute", function() { self.optionsWindow.close(); });
-                        this.optionsWindow.add(close, { flex: 0 });
-                    },
-                    closeOptions: function() {
-                        if (this.optionsWindow && this.optionsWindow.isVisible()) {
-                            this.optionsWindow.close();
-                        }
-                    },
-
-                    openOptions: function() {
-                        if (this.optionsWindow) {
-                            this.optionsWindow.open();
-                            this.optionsWindow.moveTo(120, 180);
-                            this.optionsWindow.setAlwaysOnTop(true);
-                        }
-                    },
-
-                    hasSavedFormation: function(targetCityId) {
-                        try {
-                            var cities = ClientLib.Data.MainData.GetInstance().get_Cities();
-                            var ownCity = cities.get_CurrentOwnCity();
-                            if (!ownCity) return false;
-                            var formations = this.loadFormations();
-                            var target = formations && formations[targetCityId];
-                            var own = target && target[ownCity.get_Id()];
-                            if (!own) return false;
-                            for (var key in own) {
-                                if (Object.prototype.hasOwnProperty.call(own, key) && key !== "0" && own[key]) return true;
-                            }
-                        } catch (e) { console.log(e); }
-                        return false;
-                    },
-
-                    refreshMapHighlighting: function() {
-                        try {
-                            var vis = ClientLib.Vis.VisMain.GetInstance();
-                            if (vis && typeof vis.Refresh === "function") vis.Refresh();
-                            else if (vis && typeof vis.refresh === "function") vis.refresh();
-                        } catch (e) {}
-                    },
-
-                    installMapHighlighting: function() {
-                        var self = this;
-                        function patch(regionClass, isNpc) {
-                            if (!regionClass || !regionClass.prototype || regionClass.prototype.__tafsHighlightPatched) return;
-                            var proto = regionClass.prototype;
-                            for (var key in proto) {
-                                if (typeof proto[key] !== "function") continue;
-                                var source;
-                                try { source = proto[key].toString(); } catch (e) { continue; }
-                                if (source.indexOf("Blue") === -1 || source.indexOf("Black") === -1) continue;
-                                proto[key] = function() {
-                                    var base = ClientLib.Vis.EBackgroundPlateColor.Black;
-                                    if (!isNpc && this.get_Type && this.get_Type() === ClientLib.Vis.Region.RegionCity.ERegionCityType.Own) {
-                                        base = (this.get_PlayerFaction && this.get_PlayerFaction() === 1) ? ClientLib.Vis.EBackgroundPlateColor.Cyan : ClientLib.Vis.EBackgroundPlateColor.Orange;
-                                    } else if (self.highlightSettings && self.highlightSettings.enabled && self.hasSavedFormation(this.get_Id())) {
-                                        var selected = self.highlightSettings.color || "Cyan";
-                                        base = ClientLib.Vis.EBackgroundPlateColor[selected] || ClientLib.Vis.EBackgroundPlateColor.Cyan;
-                                    }
-                                    return base;
-                                };
-                                break;
-                            }
-                            proto.__tafsHighlightPatched = true;
-                        }
-                        try {
-                            patch(ClientLib.Vis.Region.RegionCity, false);
-                            patch(ClientLib.Vis.Region.RegionNPCCamp, true);
-                            patch(ClientLib.Vis.Region.RegionNPCBase, true);
-                        } catch (e) { console.log("Formation Saver map highlighting:", e); }
-                    },
-
-                    applyCityTextColor: function() {
-                        var self = this;
-                        try {
-                            var regionClass = ClientLib.Vis.Region.RegionCity;
-                            var proto = regionClass && regionClass.prototype;
-                            if (!proto || typeof proto.LEDPWB !== "function") {
-                                console.warn("Formation Saver: City text setter LEDPWB not found.");
-                                return;
-                            }
-                            if (proto.__tafsTextColorPatched) {
-                                this.refreshMapHighlighting();
-                                return;
-                            }
-
-                            var original = proto.LEDPWB;
-                            var wrapped = function() {
-                                // Let the game create/update all labels and their native colors first.
-                                var result = original.apply(this, arguments);
-
-                                try {
-                                    if (!self.highlightSettings || !self.highlightSettings.enabled) return result;
-
-                                    var cityType = this.get_Type ? this.get_Type() : null;
-                                    var types = regionClass.ERegionCityType;
-                                    // Own cities and own-alliance bases always retain native game colors.
-                                    if (types && (cityType === types.Own || cityType === types.Alliance)) return result;
-
-                                    // Only recolor targets for which a real formation exists for the current own city.
-                                    if (!self.hasSavedFormation(this.get_Id())) return result;
-
-                                    var selectedTextColor = self.highlightSettings.textColor || "#FF6600";
-                                    var changed = false;
-                                    ["EWURCB", "AWDREQ", "LMHVYU"].forEach(function(key) {
-                                        var label = this[key];
-                                        if (label && label.Color !== selectedTextColor) {
-                                            label.Color = selectedTextColor;
-                                            changed = true;
-                                        }
-                                    }, this);
-
-                                    if (changed && this.KVDNWI && typeof this.KVDNWI.SHDYIC === "function") {
-                                        this.KVDNWI.SHDYIC();
-                                    }
-                                } catch (e) {
-                                    console.log("Formation Saver city text color:", e);
-                                }
-                                return result;
-                            };
-                            wrapped.__tafsTextColorWrapper = true;
-                            proto.LEDPWB = wrapped;
-                            proto.__tafsTextColorPatched = true;
-                            this.refreshMapHighlighting();
-                        } catch (e) {
-                            console.log("Formation Saver city text color:", e);
-                        }
-                    },
-
                     saveFormations: function(formations) {
                         var data = JSON.stringify(formations);
                         localStorage.formations = data;
@@ -598,18 +292,317 @@
                 }
             })
 
+            // ============================================================
+            // Gebäude-Saver – eigener Bereich
+            // ============================================================
+
+            var buildingSaverContainer = null;
+
+            function getCurrentBuildings() {
+
+                var city =
+                    ClientLib.Data.MainData.GetInstance()
+                .get_Cities()
+                .get_CurrentOwnCity();
+
+                var buildings = city.get_Buildings();
+                var result = [];
+
+                for (var id in buildings.d) {
+
+                    var building = buildings.d[id];
+
+                    result.push({
+                        id: building.get_Id(),
+                        name: building.get_UnitGameData_Obj().dn,
+                        x: building.get_CoordX(),
+                        y: building.get_CoordY()
+                    });
+                }
+
+                return result;
+            }
+
+            window.__harziGetCurrentBuildings = getCurrentBuildings;
+
+            function saveBuildingTest(layoutName) {
+                var city = ClientLib.Data.MainData.GetInstance().get_Cities().get_CurrentOwnCity();
+                var ownCityId = city.get_Id();
+
+                var buildings = getCurrentBuildings();
+
+                var layouts = localStorage.harziBuildingLayouts;
+                layouts = layouts ? JSON.parse(layouts) : {};
+
+                if (!layouts[ownCityId]) {
+                    layouts[ownCityId] = {};
+                }
+
+                layouts[ownCityId][layoutName] = {
+                    t: new Date().getTime(),
+                    buildings: buildings
+                };
+
+                localStorage.harziBuildingLayouts = JSON.stringify(layouts);
+
+                console.log(
+                    "Gebäude gespeichert:",
+                    "Basis", ownCityId,
+                    "Layout", layoutName,
+                    buildings.length
+                );
+            }
+
+
+            window.__harziSaveBuildingTest = saveBuildingTest;
+
+            function loadBuildingTest(layoutName) {
+
+                var city = ClientLib.Data.MainData.GetInstance()
+                .get_Cities()
+                .get_CurrentOwnCity();
+
+                var ownCityId = city.get_Id();
+
+                var layouts = localStorage.harziBuildingLayouts;
+                layouts = layouts ? JSON.parse(layouts) : {};
+
+                if (
+                    !layouts[ownCityId] ||
+                    !layouts[ownCityId][layoutName]
+                ) {
+                    console.log("Layout nicht gefunden:", layoutName);
+                    return;
+                }
+
+                var savedBuildings = layouts[ownCityId][layoutName].buildings;
+
+                if (!savedBuildings || !savedBuildings.length) {
+                    console.log("Keine Gebäude im Layout:", layoutName);
+                    return;
+                }
+
+                var buildings = city.get_Buildings();
+
+                for (var i = 0; i < savedBuildings.length; i++) {
+
+                    var saved = savedBuildings[i];
+                    var building = null;
+
+                    for (var id in buildings.d) {
+
+                        var currentBuilding = buildings.d[id];
+
+                        if (currentBuilding.get_Id() === saved.id) {
+                            building = currentBuilding;
+                            break;
+                        }
+                    }
+
+                    if (!building) {
+                        console.log(
+                            "Gebäude nicht gefunden:",
+                            saved.name,
+                            "ID", saved.id
+                        );
+                        continue;
+                    }
+
+                    console.log(
+                        "Lade Gebäude:",
+                        saved.name,
+                        "ID", saved.id,
+                        "→", saved.x, saved.y
+                    );
+
+                    building.ZRBFIX(saved.x, saved.y);
+                }
+            }
+            function initBuildingSaver() {
+
+                var playArea = qx.core.Init.getApplication().getPlayArea();
+                var repairButton = null;
+
+                function findRepairButton(widget) {
+
+                    if (!widget || !widget.getChildren) {
+                        return;
+                    }
+
+                    var children = widget.getChildren();
+
+                    for (var i = 0; i < children.length; i++) {
+
+                        var child = children[i];
+
+                        try {
+                            if (
+                                child.getLabel &&
+                                child.getLabel() === "Alles reparieren"
+                            ) {
+                                repairButton = child;
+                                return;
+                            }
+                        } catch (e) {}
+
+                        findRepairButton(child);
+
+                        if (repairButton) {
+                            return;
+                        }
+                    }
+                }
+
+                findRepairButton(playArea);
+
+                // Gebäudeansicht noch nicht vorhanden
+                if (!repairButton) {
+                    window.setTimeout(initBuildingSaver, 1000);
+                    return;
+                }
+
+                // Bereits vorhanden
+                if (
+                    buildingSaverContainer &&
+                    !buildingSaverContainer.isDisposed()
+                ) {
+                    return;
+                }
+
+                // Der bereits getestete Level-2-Container
+                var parent = repairButton.getLayoutParent();
+                parent = parent.getLayoutParent();
+
+                buildingSaverContainer =
+                    new qx.ui.container.Composite();
+
+                buildingSaverContainer.setLayout(
+                    new qx.ui.layout.Canvas()
+                );
+
+                buildingSaverContainer.setWidth(110);
+                buildingSaverContainer.setHeight(100);
+                buildingSaverContainer.setZIndex(9999);
+
+                parent.add(buildingSaverContainer, {
+                    right: 0,
+                    top: 105
+                });
+
+
+
+                var buildingButton =
+                    new qx.ui.form.Button("GEBÄUDE");
+
+                buildingButton.set({
+                    width: 100,
+                    height: 40,
+                    appearance: "button-text-small"
+                });
+
+
+
+                buildingSaverContainer.add(buildingButton, {
+                    left: 5,
+                    top: 2
+                });
+
+                buildingButton.addListener("execute", function () {
+
+                    var input = new qx.ui.form.TextField();
+                    input.set({
+                        width: 100,
+                        height: 24,
+                        placeholder: "Layoutname"
+                    });
+
+                    var layoutList = new qx.ui.container.Composite();
+                    layoutList.setLayout(new qx.ui.layout.VBox(2));
+
+                    var city = ClientLib.Data.MainData.GetInstance()
+                    .get_Cities()
+                    .get_CurrentOwnCity();
+
+                    var ownCityId = city.get_Id();
+
+                    var layouts = localStorage.harziBuildingLayouts;
+                    layouts = layouts ? JSON.parse(layouts) : {};
+
+                    if (layouts[ownCityId]) {
+
+                        for (var layoutName in layouts[ownCityId]) {
+
+                            var layoutLabel = new qx.ui.basic.Label(layoutName);
+
+                            layoutLabel.set({
+                                width: 100,
+                                height: 20,
+                                rich: true,
+                                textColor: "#FFFFFF",
+                                cursor: "pointer"
+                            });
+
+                            (function (name) {
+                                layoutLabel.addListener("click", function () {
+                                    loadBuildingTest(name);
+                                });
+                            })(layoutName);
+
+                            layoutList.add(layoutLabel);
+                        }
+                    }
+
+                    buildingSaverContainer.add(input, {
+                        left: 5,
+                        top: 44
+                    });
+
+                    buildingSaverContainer.add(layoutList, {
+                        left: 5,
+                        top: 125
+                    });
+
+                    var saveButton = new qx.ui.form.Button("Speichern");
+                    saveButton.set({
+                        width: 100,
+                        height: 24,
+                        appearance: "button-text-small"
+                    });
+
+                    buildingSaverContainer.add(saveButton, {
+                        left: 5,
+                        top: 70
+                    });
+
+                    saveButton.addListener("execute", function () {
+
+                        var name = input.getValue();
+
+                        if (!name || !name.trim()) {
+                            return;
+                        }
+
+                        saveBuildingTest(name.trim());
+
+                        console.log("Layout gespeichert:", name.trim());
+                    });
+
+                });
+
+            }
+
+            // Starten und warten, bis die Gebäudeansicht existiert
+            window.setTimeout(initBuildingSaver, 2000);
+
             windowSaver = new webfrontend.gui.PlayArea.FormationSaver();
-            windowSaver.installMapHighlighting();
-            windowSaver.applyCityTextColor();
             windowSaver.hide();
-            qx.core.Init.getApplication().getPlayArea().add(windowSaver, {top: 225, left: -2});
+            qx.core.Init.getApplication().getPlayArea().add(windowSaver, {top: 105, right: -2});
 
             if(!ClientLib.Data.MainData.GetInstance().get_Cities().__tafs__set_CurrentOwnCityId) {
                 ClientLib.Data.MainData.GetInstance().get_Cities().__tafs__set_CurrentOwnCityId = ClientLib.Data.MainData.GetInstance().get_Cities().set_CurrentOwnCityId;
             }
             ClientLib.Data.MainData.GetInstance().get_Cities().set_CurrentOwnCityId = function(a) {
                 this.__tafs__set_CurrentOwnCityId(a);
-                windowSaver.closeOptions();
                 updateView();
             }
 
@@ -618,7 +611,6 @@
             }
             ClientLib.Data.MainData.GetInstance().get_Cities().set_CurrentCityId = function(a) {
                 this.__tafs__set_CurrentCityId(a);
-                windowSaver.closeOptions();
                 updateView();
             }
 
@@ -631,7 +623,6 @@
                             windowSaver.show();
                             break;
                         default:
-                            windowSaver.closeOptions();
                             windowSaver.hide();
                     }
                 } else {
@@ -642,7 +633,6 @@
                             windowSaver.show();
                             break;
                         default:
-                            windowSaver.closeOptions();
                             windowSaver.hide();
                     }
                 }
@@ -681,4 +671,3 @@
         document.getElementsByTagName("head")[0].appendChild(tafsScript);
     }
 })();
-
