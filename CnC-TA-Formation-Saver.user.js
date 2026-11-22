@@ -3,7 +3,7 @@
 // @description    Allows you to save attack formations
 // @namespace      https://prodgame*.alliances.commandandconquer.com/*/index.aspx*
 // @match          https://*.alliances.commandandconquer.com/*/index.aspx*
-// @version        2.3.0
+// @version        2.3.5
 // @author         Panavia, KRS_L, DebitoSphere
 // @downloadURL    https://update.greasyfork.org/scripts/1905/Tiberium%20Alliances%20Formation%20Saver.user.js
 // @updateURL      https://update.greasyfork.org/scripts/1905/Tiberium%20Alliances%20Formation%20Saver.meta.js
